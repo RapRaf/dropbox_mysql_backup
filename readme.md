@@ -1,16 +1,17 @@
-# Dropbox MySQL Backup Script
+# Bash Script for MySQL Backup and Dropbox upload
 
-This Bash script performs a secure backup of a MySQL database and uploads it to Dropbox using the Dropbox API. It loads configuration variables from a `.env` file and database credentials from a `.my.conf` file. The script supports Dropbox refresh tokens and performs automatic compression and cleanup after backup.
+This Bash script performs a secure backup of a MySQL database and uploads it to Dropbox using the Dropbox API. It loads configuration variables from a `.env` file and database credentials from a `.my.cnf` file. The script supports Dropbox refresh tokens and performs automatic compression and cleanup after backup.
 
 Requirements: Ensure the following tools are installed: `mysqldump`, `jq`, `curl`, `zip`. On Debian-based systems you can install them using:
 ```bash
 sudo apt install mysql-client jq curl zip
 ```
 
-MySQL credentials: Create a `.my.conf` file in the same directory as the script to securely store your MySQL user and password credentials. Example: 
+### MySQL credentials: 
+To securely store your MySQL user and password credentials create a `.my.cnf` file in the home directory of the user executing the script. Example: 
 ```bash
-cp dropbox.my.conf .my.conf && \
-chmod 600 .my.conf
+cp dropbox.my.cnf ~/.my.cnf && \
+chmod 600 ~/.my.cnf
 ```
 ## Dropbox setup: 
 1. Visit https://www.dropbox.com/developers/apps and log in.
@@ -28,7 +29,7 @@ files.content.write | files.content.read.
 ```
 https://www.dropbox.com/oauth2/authorize?client_id={$APP_KEY}&response_type=code&token_access_type=offline&redirect_uri=http://localhost
 ```
-2. After authorizing, you'll be redirected to a URL like: (it can fail the redirect but you need the code embeded in the url) 
+2. After authorizing, you'll be redirected to a URL like: (it can fail the redirect but you just need the code embedded in the url) 
 ```
 http://localhost/?code=YOUR_AUTHORIZATION_CODE
 ```
@@ -65,11 +66,12 @@ The script is ready to be executed and it will:
 - Upload the archive to your Dropbox /backups/ folder
 - Clean up the temporary files
 
-Security tips:
-- Do not commit .env or .my.conf to version control
-- Run chmod 600 .env .my.conf to ensure only your user can read them
-
+### CRONTAB
 To automate backups, you can add the script to your crontab. Example to run every midnight:
 ```
-0 0 * * * /path/to/mysql_backup.sh >> /var/log/mysql_dropbox_backup.log 2>&1
+0 0 * * * bash /path/to/mysql_backup.sh >> /var/log/mysql_dropbox_backup.log 2>&1
 ```
+
+### Security tips:
+- Do not commit .env or .my.cnf to version control
+- Run chmod 600 .env .my.cnf to ensure only your user can read them
